@@ -26,6 +26,8 @@ sequelize
 
 app.get('/', (req, res) => res.send("nodemon!"));
 
+app.get('/api/hello', (req, res) => res.send("proxy hello"))
+
 
 app.post('/api/users/register', async (req, res) => {
   const { name, email, password, role } = req.body;
