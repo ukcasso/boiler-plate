@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const { auth } = require('./middleware/auth')
 
 // application  x-www-form-urlendcoded
 app.use(bodyParser.urlencoded({extended: true}));
@@ -26,7 +27,7 @@ sequelize
 app.get('/', (req, res) => res.send("nodemon!"));
 
 
-app.post('/register', async (req, res) => {
+app.post('/api/users/register', async (req, res) => {
   const { name, email, password, role } = req.body;
   // 회원가입시 필요한 정보들을 client에서 가져오면 그것들을 데이터 베이스에 넣어준다.
   try {
@@ -49,32 +50,34 @@ app.post('/register', async (req, res) => {
   }  
 });
 
-app.post('/login', async (req, res) => {
+app.post('/api/users/login', async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ where: { email } });
   if(!user) {
     res.status(500).json({ error: "해당하는 유저가 없습니다."})
   }
+  
   // 비밀번호 비교
   bcrypt.compare(password, user.password).then((isMatch) => {
     if(isMatch) {
-          const payload = { id: user.id };
-          jwt.sign(payload, 'secretString', {
-            expiresIn: "24h"
-          }, 
-          (err, token) => { 
-            res.cookie("token", token);
-            res.json({
-            id: user.id,
-            token: token,
-            loginSuccess: true,
-            message: "로그인 되었습니다."
-          })
-        }
-      );
+      const payload = { id: user.id };
+      jwt.sign(payload, 'secretString', {
+        expiresIn: "24h"
+      }, 
+      (err, token) => {
+        res.cookie("x_auth", token);
+        res.json({
+              id: user.id,
+              token: token,
+              loginSuccess: true,
+              message: "로그인 되었습니다."
+            })
+          }
+        );
     } else { res.status(400).json({ loginSuccess: false, message: "패스워드가 틀립니다."}) }
   })
-
 })
+
+
 
 app.listen(port, () => console.log(`server is running on port ${port}`));
