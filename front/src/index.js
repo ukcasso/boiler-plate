@@ -16,7 +16,7 @@ ReactDOM.render(
     <Provider store={createStoreWithMiddleware(Reducer,
         // redux devtools 에서 찾을 수 있게 해주는 코드( 연결 )
         window.__REDUX_DEVTOOLS_EXTENSION__ &&
-        winodw.__REDUX_DEVTOOLS_EXTENSION__()
+        window.__REDUX_DEVTOOLS_EXTENSION__()
         )}
     >
         <App />
